@@ -4,12 +4,12 @@
 #define RADIOLIB_STATIC_ONLY 1
 #include <RadioLib.h>
 #include <helpers/radiolib/RadioLibWrappers.h>
-#include <ESP32S3SMBoard.h>
+#include <ESP32C3SuperMiniBoard.h>
 #include <helpers/radiolib/CustomSX1262Wrapper.h>
 #include <helpers/AutoDiscoverRTCClock.h>
 #include <helpers/sensors/EnvironmentSensorManager.h>
 
-extern ESP32S3SMBoard board;
+extern ESP32C3SuperMiniBoard board;
 extern WRAPPER_CLASS radio_driver;
 extern AutoDiscoverRTCClock rtc_clock;
 extern EnvironmentSensorManager sensors;

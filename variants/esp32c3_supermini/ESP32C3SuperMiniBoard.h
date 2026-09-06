@@ -3,7 +3,7 @@
 #include <helpers/ESP32Board.h>
 #include <Arduino.h>
 
-class ESP32S3SMBoard : public ESP32Board {
+class ESP32C3SuperMiniBoard : public ESP32Board {
 public:
   void begin() {
     ESP32Board::begin();
