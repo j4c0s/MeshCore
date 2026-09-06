@@ -40,7 +40,7 @@ bool radio_init() {
   Wire.begin();
 #endif
   rtc_clock.begin(Wire);
-  sensors.begin(Wire);
+  sensors.begin();
 
 #if ENV_INCLUDE_GPS && defined(PIN_GPS_RX) && defined(PIN_GPS_TX)
   gpsSerial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);

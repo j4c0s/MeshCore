@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Arduino.h>
 #define RADIOLIB_STATIC_ONLY 1
 #include <RadioLib.h>
 #include <helpers/radiolib/RadioLibWrappers.h>
