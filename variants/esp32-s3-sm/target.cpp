@@ -5,9 +5,11 @@ ESP32S3SMBoard board;
 
 #if defined(P_LORA_SCLK)
   static SPIClass spi;
-  RADIO_CLASS radio = new Module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY, spi);
+  static Module module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY, spi);
+  RADIO_CLASS radio(&module);
 #else
-  RADIO_CLASS radio = new Module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY);
+  static Module module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY);
+  RADIO_CLASS radio(&module);
 #endif
 
 WRAPPER_CLASS radio_driver(radio, board);
@@ -29,6 +31,7 @@ AutoDiscoverRTCClock rtc_clock(fallback_clock);
 #endif
 
 bool radio_init() {
+  board.begin();
   fallback_clock.begin();
 
 #if defined(PIN_BOARD_SDA) && defined(PIN_BOARD_SCL)
@@ -37,6 +40,7 @@ bool radio_init() {
   Wire.begin();
 #endif
   rtc_clock.begin(Wire);
+  sensors.begin(Wire);
 
 #if ENV_INCLUDE_GPS && defined(PIN_GPS_RX) && defined(PIN_GPS_TX)
   gpsSerial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
