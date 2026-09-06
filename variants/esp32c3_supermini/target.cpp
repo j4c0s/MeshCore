@@ -3,14 +3,9 @@
 
 ESP32C3SuperMiniBoard board;
 
-#if defined(P_LORA_SCLK)
-  static SPIClass spi(FSPI);
-  static Module module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY, spi);
-  RADIO_CLASS radio(&module);
-#else
-  static Module module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY);
-  RADIO_CLASS radio(&module);
-#endif
+static SPIClass spi(FSPI);
+static Module module(P_LORA_NSS, P_LORA_DIO_1, P_LORA_RESET, P_LORA_BUSY, spi);
+RADIO_CLASS radio(&module);
 
 WRAPPER_CLASS radio_driver(radio, board);
 
@@ -46,15 +41,11 @@ bool radio_init() {
   gpsSerial.begin(9600, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
 #endif
 
-#if defined(P_LORA_SCLK)
   spi.begin(P_LORA_SCLK, P_LORA_MISO, P_LORA_MOSI, P_LORA_NSS);
   return radio.std_init(&spi);
-#else
-  return radio.std_init();
-#endif
 }
 
 mesh::LocalIdentity radio_new_identity() {
   RadioNoiseListener rng(radio);
-  return mesh::LocalIdentity(&rng);  // create new random identity
+  return mesh::LocalIdentity(&rng);
 }
