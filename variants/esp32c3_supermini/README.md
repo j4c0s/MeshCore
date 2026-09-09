@@ -36,8 +36,8 @@ This variant supports the **ESP32-C3 Super Mini** board with an **SX1262 (HT-RA6
 |---------|--------------|-------------|
 | VCC     | 3.3V         | Power (3.3V) |
 | GND     | GND          | Ground |
-| TX      | GPIO 20      | UART RX (MCU RX) |
-| RX      | GPIO 21      | UART TX (MCU TX) |
+| TX      | GPIO 21      | UART RX (MCU RX) |
+| RX      | GPIO 20      | UART TX (MCU TX) |
 
 ---
 
