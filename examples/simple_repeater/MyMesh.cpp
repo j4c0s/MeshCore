@@ -1455,6 +1455,7 @@ void MyMesh::loop() {
 #endif
 
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet *pkt = createSelfAdvert();

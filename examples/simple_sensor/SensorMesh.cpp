@@ -907,6 +907,7 @@ bool  SensorMesh::getGPS(uint8_t channel, float& lat, float& lon, float& alt) {
 
 void SensorMesh::loop() {
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet* pkt = createSelfAdvert();

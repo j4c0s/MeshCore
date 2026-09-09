@@ -994,6 +994,7 @@ bool MyMesh::saveFilter(ClientInfo* client) {
 
 void MyMesh::loop() {
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (millisHasNowPassed(next_push) && acl.getNumClients() > 0) {
     // check for ACK timeouts
