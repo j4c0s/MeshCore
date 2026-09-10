@@ -296,4 +296,5 @@ public:
   void handleCommand(uint32_t sender_timestamp, char* command, char* reply);
   uint8_t buildAdvertData(uint8_t node_type, uint8_t* app_data);
   void loop();
+  bool isPinActive() const { return _pin_state || _pin_in_interval; }
 };

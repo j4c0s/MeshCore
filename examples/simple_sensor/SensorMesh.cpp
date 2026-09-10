@@ -992,5 +992,6 @@ void SensorMesh::loop() {
 
 // To check if there is pending work
 bool SensorMesh::hasPendingWork() const {
+  if (_cli.isPinActive()) return true;
   return _mgr->getOutboundTotal() > 0;
 }
