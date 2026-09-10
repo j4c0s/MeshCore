@@ -269,6 +269,13 @@ class CommonCLI {
   ClientACL* _acl;
   char tmp[PRV_KEY_SIZE*2 + 4];
 
+  bool _pin_state = false;
+  uint32_t _pin_off_time = 0;
+  uint32_t _pin_interval_s = 0;
+  uint32_t _pin_duration_s = 0;
+  uint32_t _pin_next_toggle_time = 0;
+  bool _pin_in_interval = false;
+
   mesh::RTCClock* getRTCClock() { return _rtc; }
   void savePrefs();
   void loadPrefsInt(FILESYSTEM* _fs, const char* filename);
@@ -288,4 +295,6 @@ public:
   bool savePrefs(FILESYSTEM* _fs);
   void handleCommand(uint32_t sender_timestamp, char* command, char* reply);
   uint8_t buildAdvertData(uint8_t node_type, uint8_t* app_data);
+  void loop();
+  bool isPinActive() const { return _pin_state || _pin_in_interval; }
 };

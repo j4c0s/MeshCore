@@ -907,6 +907,7 @@ bool  SensorMesh::getGPS(uint8_t channel, float& lat, float& lon, float& alt) {
 
 void SensorMesh::loop() {
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet* pkt = createSelfAdvert();
@@ -991,5 +992,6 @@ void SensorMesh::loop() {
 
 // To check if there is pending work
 bool SensorMesh::hasPendingWork() const {
+  if (_cli.isPinActive()) return true;
   return _mgr->getOutboundTotal() > 0;
 }

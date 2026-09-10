@@ -510,9 +510,105 @@ void CommonCLI::handleCommand(uint32_t sender_timestamp, char* command, char* re
       _callbacks->formatRadioStatsReply(reply);
     } else if (sender_timestamp == 0 && memcmp(command, "stats-core", 10) == 0 && (command[10] == 0 || command[10] == ' ')) {
       _callbacks->formatStatsReply(reply);
+#if defined(PIN_GPIO)
+    } else if (memcmp(command, "pin ", 4) == 0 || strcmp(command, "pin") == 0) {
+      const char* sub = (command[3] == ' ') ? command + 4 : "";
+      if (strcmp(sub, "on") == 0 || strcmp(sub, "1") == 0) {
+        pinMode(PIN_GPIO, OUTPUT);
+        digitalWrite(PIN_GPIO, HIGH);
+        _pin_state = true;
+        _pin_off_time = 0;
+        _pin_in_interval = false;
+        sprintf(reply, "OK - pin %d ON", PIN_GPIO);
+      } else if (strcmp(sub, "off") == 0 || strcmp(sub, "0") == 0) {
+        pinMode(PIN_GPIO, OUTPUT);
+        digitalWrite(PIN_GPIO, LOW);
+        _pin_state = false;
+        _pin_off_time = 0;
+        _pin_in_interval = false;
+        sprintf(reply, "OK - pin %d OFF", PIN_GPIO);
+      } else if (memcmp(sub, "on ", 3) == 0) {
+        uint32_t duration_s = atoi(sub + 3);
+        if (duration_s > 0) {
+          pinMode(PIN_GPIO, OUTPUT);
+          digitalWrite(PIN_GPIO, HIGH);
+          _pin_state = true;
+          _pin_off_time = millis() + duration_s * 1000UL;
+          _pin_in_interval = false;
+          sprintf(reply, "OK - pin %d ON for %us", PIN_GPIO, duration_s);
+        } else {
+          strcpy(reply, "ERR: duration must be > 0");
+        }
+      } else if (memcmp(sub, "interval ", 9) == 0 || memcmp(sub, "interval,", 9) == 0) {
+        const char* p = sub + 9;
+        uint32_t interval_s = 0;
+        uint32_t duration_s = 0;
+        if (sscanf(p, "%u,%u", &interval_s, &duration_s) == 2 || sscanf(p, "%u %u", &interval_s, &duration_s) == 2) {
+          if (interval_s > 0 && duration_s > 0) {
+            _pin_interval_s = interval_s;
+            _pin_duration_s = duration_s;
+            _pin_in_interval = true;
+            pinMode(PIN_GPIO, OUTPUT);
+            digitalWrite(PIN_GPIO, HIGH);
+            _pin_state = true;
+            uint32_t now = millis();
+            _pin_off_time = now + duration_s * 1000UL;
+            _pin_next_toggle_time = 0;
+            sprintf(reply, "OK - pin %d interval %us, duration %us", PIN_GPIO, interval_s, duration_s);
+          } else {
+            strcpy(reply, "ERR: interval and duration must be > 0");
+          }
+        } else {
+          strcpy(reply, "ERR: usage pin interval <interval_s>,<duration_s>");
+        }
+      } else if (strlen(sub) > 0 && isdigit(sub[0])) {
+        uint32_t duration_s = atoi(sub);
+        if (duration_s > 0) {
+          pinMode(PIN_GPIO, OUTPUT);
+          digitalWrite(PIN_GPIO, HIGH);
+          _pin_state = true;
+          _pin_off_time = millis() + duration_s * 1000UL;
+          _pin_in_interval = false;
+          sprintf(reply, "OK - pin %d ON for %us", PIN_GPIO, duration_s);
+        } else {
+          strcpy(reply, "ERR: duration must be > 0");
+        }
+      } else {
+        sprintf(reply, "pin %d state: %s", PIN_GPIO, _pin_state ? "HIGH" : "LOW");
+      }
+#else
+    } else if (memcmp(command, "pin", 3) == 0) {
+      strcpy(reply, "ERR: PIN_GPIO not defined");
+#endif
     } else {
       strcpy(reply, "Unknown command");
     }
+}
+
+void CommonCLI::loop() {
+#if defined(PIN_GPIO)
+  uint32_t now = millis();
+  if (_pin_state) {
+    if (_pin_off_time != 0 && (int32_t)(now - _pin_off_time) >= 0) {
+      digitalWrite(PIN_GPIO, LOW);
+      _pin_state = false;
+      _pin_off_time = 0;
+      if (_pin_in_interval && _pin_interval_s > 0) {
+        _pin_next_toggle_time = now + _pin_interval_s * 1000UL;
+      }
+    }
+  } else {
+    if (_pin_in_interval && _pin_interval_s > 0 && _pin_next_toggle_time != 0) {
+      if ((int32_t)(now - _pin_next_toggle_time) >= 0) {
+        pinMode(PIN_GPIO, OUTPUT);
+        digitalWrite(PIN_GPIO, HIGH);
+        _pin_state = true;
+        _pin_off_time = now + _pin_duration_s * 1000UL;
+        _pin_next_toggle_time = 0;
+      }
+    }
+  }
+#endif
 }
 
 void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* reply) {

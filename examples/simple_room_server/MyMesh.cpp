@@ -994,6 +994,7 @@ bool MyMesh::saveFilter(ClientInfo* client) {
 
 void MyMesh::loop() {
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (millisHasNowPassed(next_push) && acl.getNumClients() > 0) {
     // check for ACK timeouts
@@ -1080,5 +1081,6 @@ void MyMesh::loop() {
 
 // To check if there is pending work
 bool MyMesh::hasPendingWork() const {
+  if (_cli.isPinActive()) return true;
   return _mgr->getOutboundTotal() > 0;
 }

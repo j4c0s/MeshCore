@@ -1455,6 +1455,7 @@ void MyMesh::loop() {
 #endif
 
   mesh::Mesh::loop();
+  _cli.loop();
 
   if (next_flood_advert && millisHasNowPassed(next_flood_advert)) {
     mesh::Packet *pkt = createSelfAdvert();
@@ -1498,6 +1499,7 @@ void MyMesh::loop() {
 
 // To check if there is pending work
 bool MyMesh::hasPendingWork() const {
+  if (_cli.isPinActive()) return true;
 #if defined(WITH_BRIDGE)
   if (bridge.isRunning()) return true;  // bridge needs WiFi radio, can't sleep
 #endif
