@@ -36,8 +36,15 @@ This variant supports the **ESP32-C3 Super Mini** board with an **SX1262 (HT-RA6
 |---------|--------------|-------------|
 | VCC     | 3.3V         | Power (3.3V) |
 | GND     | GND          | Ground |
-| TX      | GPIO 21      | UART RX (MCU RX) |
-| RX      | GPIO 20      | UART TX (MCU TX) |
+| TX      | GPIO 21      | UART RX (MCU RX) - *Note: Conflicts with Native USB CDC if enabled* |
+| RX      | GPIO 20      | UART TX (MCU TX) - *Note: Conflicts with Native USB CDC if enabled* |
+
+---
+
+## ⚙️ Hardware Notes
+
+* **SX1262 Crystal (XTAL):** The SX1262 (HT-RA62 / Ra-01SH) module uses a 32 MHz XTAL crystal (`SX126X_DIO3_TCXO_VOLTAGE=0`). Setting `SX126X_DIO3_TCXO_VOLTAGE=0` allows proper radio initialization and enables RX Power Saving (RXPS) duty-cycling.
+* **Native USB CDC:** GPIO 20 (USB D-) and GPIO 21 (USB D+) are used for Native USB CDC when `ARDUINO_USB_CDC_ON_BOOT=1` is active.
 
 ---
 
