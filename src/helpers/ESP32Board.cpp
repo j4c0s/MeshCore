@@ -14,6 +14,7 @@
 
 bool ESP32Board::startOTAUpdate(const char* id, char reply[]) {
   inhibit_sleep = true;   // prevent sleep during OTA
+  ota_start_time = millis();
   WiFi.mode(WIFI_AP);
   WiFi.setSleep(false);
   esp_wifi_set_ps(WIFI_PS_NONE);

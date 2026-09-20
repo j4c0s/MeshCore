@@ -21,6 +21,7 @@ protected:
   uint8_t startup_reason;
   bool inhibit_sleep = false;
   uint32_t inhibit_sleep_until = 0;
+  uint32_t ota_start_time = 0;
   static inline portMUX_TYPE sleepMux = portMUX_INITIALIZER_UNLOCKED;
 
 public:
@@ -74,6 +75,11 @@ public:
   void sleep(uint32_t secs) override {
     // Skip if not allow to sleep
     if (inhibit_sleep || (int32_t)(inhibit_sleep_until - millis()) > 0) {
+      if (ota_start_time != 0 && (millis() - ota_start_time >= 300000UL)) {
+        MESH_DEBUG_PRINTLN("OTA timeout reached (5 mins). Rebooting...");
+        delay(100);
+        reboot();
+      }
       delay(1); // Give MCU to OTA to run
       return;
     }
