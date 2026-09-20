@@ -19,7 +19,7 @@ bool ESP32Board::startOTAUpdate(const char* id, char reply[]) {
   esp_wifi_set_ps(WIFI_PS_NONE);
 
 #ifdef WIFI_TX_POWER
-  WiFi.setTxPower(WIFI_TX_POWER);
+  WiFi.setTxPower((wifi_power_t)WIFI_TX_POWER);
 #endif
 
   WiFi.softAP("MeshCore-OTA", NULL);
