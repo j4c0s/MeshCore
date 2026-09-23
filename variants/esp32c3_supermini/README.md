@@ -45,6 +45,10 @@ This variant supports the **ESP32-C3 Super Mini** board with an **SX1262 (HT-RA6
 
 * **SX1262 Crystal (XTAL):** The SX1262 (HT-RA62 / Ra-01SH) module uses a 32 MHz XTAL crystal (`SX126X_DIO3_TCXO_VOLTAGE=0`). Setting `SX126X_DIO3_TCXO_VOLTAGE=0` allows proper radio initialization and enables RX Power Saving (RXPS) duty-cycling.
 * **Native USB CDC:** GPIO 20 (USB D-) and GPIO 21 (USB D+) are used for Native USB CDC when `ARDUINO_USB_CDC_ON_BOOT=1` is active.
+* **Power Saving & RXPS:**
+  * `radio.rxps` duty-cycles the SX1262 LoRa radio chip, reducing radio RX power consumption.
+  * However, the ESP32-C3 MCU itself draws ~12–13 mA at 80 MHz in active CPU mode. If MCU light sleep is not enabled, the MCU active current dominates total board power consumption.
+  * To achieve maximum power savings, enable MCU light sleep in CLI via `set powersaving on` (or `set power.saving 1`) and ensure the device is powered externally without active USB CDC / Serial connections.
 
 ---
 
