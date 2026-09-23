@@ -43,7 +43,7 @@ This variant supports the **ESP32-C3 Super Mini** board with an **SX1262 (HT-RA6
 
 ## ⚙️ Hardware Notes
 
-* **SX1262 Crystal (XTAL):** The SX1262 (HT-RA62 / Ra-01SH) module uses a 32 MHz XTAL crystal (`SX126X_DIO3_TCXO_VOLTAGE=0`). Setting `SX126X_DIO3_TCXO_VOLTAGE=0` allows proper radio initialization and enables RX Power Saving (RXPS) duty-cycling.
+* **SX1262 TCXO:** The SX1262 module uses a 1.8V TCXO (`SX126X_DIO3_TCXO_VOLTAGE=1.8`). Setting `MC_TCXO_DELAY_US=5000` provides sufficient startup time (5000 µs) when waking up from duty-cycle sleep, enabling reliable RX Power Saving (RXPS) duty-cycling.
 * **Native USB CDC:** GPIO 20 (USB D-) and GPIO 21 (USB D+) are used for Native USB CDC when `ARDUINO_USB_CDC_ON_BOOT=1` is active.
 
 ---
