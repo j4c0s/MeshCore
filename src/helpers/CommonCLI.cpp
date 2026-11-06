@@ -171,13 +171,15 @@ uint8_t CommonCLI::buildAdvertData(uint8_t node_type, uint8_t* app_data) {
   if (_prefs->advert_loc_policy == ADVERT_LOC_NONE) {
     AdvertDataBuilder builder(node_type, _prefs->node_name);
     return builder.encodeTo(app_data);
-  } else if (_prefs->advert_loc_policy == ADVERT_LOC_SHARE) {
+  }
+#if ENV_INCLUDE_GPS == 1
+  if (_prefs->advert_loc_policy == ADVERT_LOC_SHARE) {
     AdvertDataBuilder builder(node_type, _prefs->node_name, _sensors->node_lat, _sensors->node_lon);
     return builder.encodeTo(app_data);
-  } else {
-    AdvertDataBuilder builder(node_type, _prefs->node_name, _prefs->node_lat, _prefs->node_lon);
-    return builder.encodeTo(app_data);
   }
+#endif
+  AdvertDataBuilder builder(node_type, _prefs->node_name, _prefs->node_lat, _prefs->node_lon);
+  return builder.encodeTo(app_data);
 }
 
 void CommonCLI::handleCommand(uint32_t sender_timestamp, char* command, char* reply) {
@@ -343,6 +345,36 @@ void CommonCLI::handleCommand(uint32_t sender_timestamp, char* command, char* re
       }
     } else if (memcmp(command, "region", 6) == 0) {
       handleRegionCmd(command, reply);
+    } else if (memcmp(command, "gps advert", 10) == 0) {
+      if (strlen(command) == 10) {
+        switch (_prefs->advert_loc_policy) {
+          case ADVERT_LOC_NONE:
+            strcpy(reply, "> none");
+            break;
+          case ADVERT_LOC_PREFS:
+            strcpy(reply, "> prefs");
+            break;
+          case ADVERT_LOC_SHARE:
+            strcpy(reply, "> share");
+            break;
+          default:
+            strcpy(reply, "error");
+        }
+      } else if (memcmp(command+11, "none", 4) == 0) {
+        _prefs->advert_loc_policy = ADVERT_LOC_NONE;
+        savePrefs();
+        strcpy(reply, "ok");
+      } else if (memcmp(command+11, "share", 5) == 0) {
+        _prefs->advert_loc_policy = ADVERT_LOC_SHARE;
+        savePrefs();
+        strcpy(reply, "ok");
+      } else if (memcmp(command+11, "prefs", 5) == 0) {
+        _prefs->advert_loc_policy = ADVERT_LOC_PREFS;
+        savePrefs();
+        strcpy(reply, "ok");
+      } else {
+        strcpy(reply, "error");
+      }
 #if ENV_INCLUDE_GPS == 1
     } else if (memcmp(command, "gps on", 6) == 0) {
       if (_sensors->setSettingValue("gps", "1")) {
@@ -387,36 +419,6 @@ void CommonCLI::handleCommand(uint32_t sender_timestamp, char* command, char* re
       _prefs->node_lon = _sensors->node_lon;
       savePrefs();
       strcpy(reply, "ok");
-    } else if (memcmp(command, "gps advert", 10) == 0) {
-      if (strlen(command) == 10) {
-        switch (_prefs->advert_loc_policy) {
-          case ADVERT_LOC_NONE:
-            strcpy(reply, "> none");
-            break;
-          case ADVERT_LOC_PREFS:
-            strcpy(reply, "> prefs");
-            break;
-          case ADVERT_LOC_SHARE:
-            strcpy(reply, "> share");
-            break;
-          default:
-            strcpy(reply, "error");
-        }
-      } else if (memcmp(command+11, "none", 4) == 0) {
-        _prefs->advert_loc_policy = ADVERT_LOC_NONE;
-        savePrefs();
-        strcpy(reply, "ok");
-      } else if (memcmp(command+11, "share", 5) == 0) {
-        _prefs->advert_loc_policy = ADVERT_LOC_SHARE;
-        savePrefs();
-        strcpy(reply, "ok");
-      } else if (memcmp(command+11, "prefs", 5) == 0) {
-        _prefs->advert_loc_policy = ADVERT_LOC_PREFS;
-        savePrefs();
-        strcpy(reply, "ok");
-      } else {
-        strcpy(reply, "error");
-      }
     } else if (memcmp(command, "gps", 3) == 0) {
       LocationProvider * l = _sensors->getLocationProvider();
       if (l != NULL) {
